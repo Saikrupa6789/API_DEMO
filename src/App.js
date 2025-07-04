@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const API_URL = "https://api.example.com/doctors";
+const API_KEY = "12345-ABCDE";
 
 function App() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    axios.get(API_URL, {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    })
+    .then((res) => {
+      setDoctors(res.data);  // Assuming API returns an array of doctors
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error(err);
+      setError("Failed to fetch doctors.");
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Doctor List</h1>
+      <ul>
+        {doctors.map((doc) => (
+          <li key={doc.id}>{doc.name}</li>
+        ))}
+      </ul>
     </div>
   );
 }
 
 export default App;
+
